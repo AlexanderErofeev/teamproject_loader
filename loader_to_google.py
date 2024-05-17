@@ -1,6 +1,6 @@
 from googleapiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
-from loader_settings import *
+from settings import CREDENTIALS_FILE, SCOPES
 
 
 def connection_to_sheets():
@@ -8,17 +8,24 @@ def connection_to_sheets():
     return build('sheets', 'v4', credentials=credentials)
 
 
-def update_table(service, cell, values):
+def get_table(service, list_dict, range_table):
+    return service.spreadsheets().values().get(
+        spreadsheetId=list_dict['spreadsheet_id'],
+        range=list_dict['list_name'] + '!' + range_table,
+    ).execute()['values']
+
+
+def update_table(service, list_dict, cell, values):
     service.spreadsheets().values().update(
-        spreadsheetId=spreadsheet_id,
+        spreadsheetId=list_dict['spreadsheet_id'],
         valueInputOption='USER_ENTERED',
-        range=LIST_NAME + '!' + cell,
+        range=list_dict['list_name'] + '!' + cell,
         body={"values": values}
     ).execute()
 
 
-def clear_table(service, cell):
+def clear_table(service, list_dict, cell):
     service.spreadsheets().values().clear(
-        spreadsheetId=spreadsheet_id,
-        range=LIST_NAME + '!' + cell,
+        spreadsheetId=list_dict['spreadsheet_id'],
+        range=list_dict['list_name'] + '!' + cell,
     ).execute()
