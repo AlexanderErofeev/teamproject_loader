@@ -88,7 +88,7 @@ def update_scores(start_scores, target_scores):
         missing_students = set(start_scores['fio']) - old_students
         if len(missing_students) != 0:
             print_log(f"Нет студентов: {', '.join(list(missing_students))}", is_error=True)
-            return
+            # return
 
         updated_students = []
         for student in old_students:
