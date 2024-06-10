@@ -12,8 +12,8 @@ def get_results_team(x):
 
     documents = requests_get(f'{DOMAIN}/api/v2/workspaces/{id}/documents/results').json()
 
-    report = documents['reportId'] is not None
-    presentation = documents['presentationId'] is not None
+    report = 'Есть' if documents['reportId'] is not None else 'Нет'
+    presentation = 'Есть' if documents['presentationId'] is not None else 'Нет'
 
     title_str = f'=ГИПЕРССЫЛКА("{DOMAIN}/#/{id}/documents/results"; "{title} ({sub_title})")'
     return title_str, report, presentation
