@@ -74,13 +74,13 @@ def get_curator_scores():
     return result
 
 
-def update_scores(start_scores, target_scores):
+def update_scores(global_start_scores, global_target_scores):
     iterations = get_grading_iterations()
     print_log(f"Обновление баллов за итерации: {', '.join(list(iterations))}")
     for iteration in iterations:
         print_log(f"Обновление итерации: {iteration}")
-        start_scores = start_scores[start_scores[iteration] != UNKNOWN_SCORE]
-        target_scores = target_scores[target_scores[iteration] != UNKNOWN_SCORE]
+        start_scores = global_start_scores[global_start_scores[iteration] != UNKNOWN_SCORE]
+        target_scores = global_target_scores[global_target_scores[iteration] != UNKNOWN_SCORE]
 
         old_students = set(target_scores['fio']) & set(start_scores['fio'])
         new_students = set(target_scores['fio']) - old_students
