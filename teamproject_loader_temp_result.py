@@ -59,9 +59,9 @@ def get_teams():
     teamproject_counts = 0
     get_data = []
     for search_prefix in SEARCH_PREFIXS:
-        temp_teamproject_counts = requests_get(f'{DOMAIN}/api/v2/workspaces/?status=active&year={YEAR}&semester={SEMESTR}&search={search_prefix}').json()['total']
+        temp_teamproject_counts = requests_get(f'{DOMAIN}/api/v2/workspaces/?status=any&year={YEAR}&semester={SEMESTR}&search={search_prefix}').json()['total']
         for i in range(1, math.ceil(temp_teamproject_counts / PER_PAGE_RESULTS) + 1):
-            get_data.append(requests_get(f'{DOMAIN}/api/v2/workspaces/?status=active&year={YEAR}&semester={SEMESTR}&size={PER_PAGE_RESULTS}&page={i}&search={search_prefix}').json()['items'])
+            get_data.append(requests_get(f'{DOMAIN}/api/v2/workspaces/?status=any&year={YEAR}&semester={SEMESTR}&size={PER_PAGE_RESULTS}&page={i}&search={search_prefix}').json()['items'])
         teamproject_counts += temp_teamproject_counts
     get_data = sum_mas(get_data)
     print_log(f"Всего команд в teamproject: {teamproject_counts}")
