@@ -21,8 +21,6 @@ def get_results_team(x):
 
 if __name__ == '__main__':
     get_data = get_teams()
-    get_data = [team for team in get_data if team['mainCurator']['fullname'] != 'Новиков Максим Юрьевич']
-    print_log(f"Получено команд не Новикова из teamproject: {len(get_data)}")
 
     teams = pd.DataFrame(get_data, columns=['title', 'instanceNumber', 'id'])
 
