@@ -22,7 +22,9 @@ def get_result_iteration(members, s2s, c2s):
 
 def get_results_team(x):
     title, sub_title, id = x['title'], x['instanceNumber'], x['id']
-    # print_log(f"Загрузка команды: {title} ({sub_title})")
+
+    title = title.replace('. ', '.')
+    sub_title = str(sub_title).zfill(2)
 
     details = requests_get(f'{DOMAIN}/api/v2/workspaces/{id}/scores/details').json()
     iterations = details['iterations']
@@ -49,7 +51,7 @@ def get_results_team(x):
     max_score = df['coefficient'].max()
     df['coefficient'] = df['coefficient'].apply(lambda el: round(el / max_score, 2))
 
-    title_str = f'=ГИПЕРССЫЛКА("{DOMAIN}/#/{id}/rating/result"; "{title} ({sub_title})")'
+    title_str = f'=ГИПЕРССЫЛКА("{DOMAIN}/#/{id}/rating/result"; "{title}.{sub_title}")'
     df.insert(0, 'title', [title_str] * len(members))
     return df
 
@@ -59,9 +61,9 @@ def get_teams():
     teamproject_counts = 0
     get_data = []
     for search_prefix in SEARCH_PREFIXS:
-        temp_teamproject_counts = requests_get(f'{DOMAIN}/api/v2/workspaces/?status=any&year={YEAR}&semester={SEMESTR}&search={search_prefix}').json()['total']
+        temp_teamproject_counts = requests_get(f'{DOMAIN}/api/v2/catalog/?status=any&year={YEAR}&semester={SEMESTR}&search={search_prefix}').json()['total']
         for i in range(1, math.ceil(temp_teamproject_counts / PER_PAGE_RESULTS) + 1):
-            get_data.append(requests_get(f'{DOMAIN}/api/v2/workspaces/?status=any&year={YEAR}&semester={SEMESTR}&size={PER_PAGE_RESULTS}&page={i}&search={search_prefix}').json()['items'])
+            get_data.append(requests_get(f'{DOMAIN}/api/v2/catalog/?status=any&year={YEAR}&semester={SEMESTR}&size={PER_PAGE_RESULTS}&page={i}&search={search_prefix}').json()['items'])
         teamproject_counts += temp_teamproject_counts
     get_data = sum_mas(get_data)
     print_log(f"Всего команд в teamproject: {teamproject_counts}")

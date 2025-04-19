@@ -22,16 +22,15 @@ def get_grading_iterations():
 
 def get_result_iteration(members, c2s):
     c2s_dict = c2s.iloc[:,0].to_dict()
-    # print(c2s_dict)
-
     students_result = {fio: c2s_dict[id] for id, fio in members.items()}
-    # print(students_result)
     return pd.DataFrame([students_result])
 
 
 def get_results_team(x):
     title, sub_title, id = x['title'], x['instanceNumber'], x['id']
-    # print_log(f"Загрузка команды: {title} ({sub_title})")
+
+    title = title.replace('. ', '.')
+    sub_title = str(sub_title).zfill(2)
 
     details = requests_get(f'{DOMAIN}/api/v2/workspaces/{id}/scores/details').json()
     iterations = details['iterations']
@@ -51,7 +50,7 @@ def get_results_team(x):
     df = pd.concat(result_mas).T
     df.columns = [iter['title'] for iter in ITERATIONS]
 
-    linc_str = f'=ГИПЕРССЫЛКА("{DOMAIN}/#/{id}/rating/estimate"; "{title} ({sub_title})")'
+    linc_str = f'=ГИПЕРССЫЛКА("{DOMAIN}/#/{id}/rating/estimate"; "{title}.{sub_title}")'
     df.insert(0, 'Ссылка teamproject', [linc_str] * len(members))
     df.insert(0, 'team id teamproject', [id] * len(members))
     return df

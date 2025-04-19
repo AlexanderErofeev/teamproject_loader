@@ -1,7 +1,6 @@
-import multiprocessing.dummy
-import math
 from settings import *
-from utils import requests_get, sum_mas, requests_post, print_log
+from utils import requests_post, requests_put, print_log, multiprocessing_map, requests_get
+from teamproject_loader_temp_result import get_teams
 
 
 def create_iterations(workspace_id):
@@ -10,23 +9,30 @@ def create_iterations(workspace_id):
         requests_post(f'{DOMAIN}/api/v2/workspaces/{workspace_id}/iterations', data=iteration)
 
 
+def update_iterations(workspace_id):
+    print_log(f"Обновление итераций в команде {workspace_id}")
+    iterations = requests_get(f'{DOMAIN}/api/v2/workspaces/{workspace_id}/iterations').json()
+
+    target_iteration = [iteration for iteration in iterations if iteration['title'] == 'Защита'][0]
+    print_log(target_iteration)
+    target_iteration_id = target_iteration['id']
+
+    new_target_iteration = ITERATIONS[-1]
+    new_target_iteration['id'] = target_iteration_id
+    print_log(new_target_iteration)
+
+    requests_put(f'{DOMAIN}/api/v2/iterations/{target_iteration_id}', data=new_target_iteration)
+
+
 if __name__ == '__main__':
-    print_log(f"Поиск команд в teamproject")
-    workspaces = []
-    for search_prefix in SEARCH_PREFIXS:
-        teamproject_counts = requests_get(f'{DOMAIN}/api/v2/workspaces?status=active&year={YEAR}&semester={SEMESTR}&search={search_prefix}').json()['total']
-        print_log(f"Всего команд {search_prefix} в teamproject: {teamproject_counts}")
+    workspaces = get_teams()
 
-        for i in range(1, math.ceil(teamproject_counts / PER_PAGE_RESULTS) + 1):
-            workspaces.append(requests_get(f'{DOMAIN}/api/v2/workspaces?status=active&year={YEAR}&semester={SEMESTR}&size={PER_PAGE_RESULTS}&page={i}&search={search_prefix}').json()['items'])
+    workspaces = [workspace for workspace in workspaces if workspace['mainCurator'] and workspace['mainCurator']['fullname'] == 'Шадрин Денис Борисович']
+    print_log(f"Получено команд Шадрина Дениса Борисовича из teamproject: {len(workspaces)}")
 
-    workspaces = sum_mas(workspaces)
-    workspace_ids = [workspace['id'] for workspace in workspaces]
+    # workspace_ids = [workspace['id'] for workspace in workspaces]
+    # print_log(f"Создание итераций в {len(workspace_ids)} команд")
+    # multiprocessing_map(create_iterations, workspace_ids)
 
-    print_log(f"Создание итераций в {len(workspace_ids)} команд")
-
-    if IS_USES_THREADING:
-        with multiprocessing.dummy.Pool(THREAD_COUNT) as p:
-            p.map(create_iterations, workspace_ids)
-    else:
-        list(map(create_iterations, workspace_ids))
+    # print_log(f"Обновление итераций в {len(workspace_ids)} команд")
+    # list(map(update_iterations, workspace_ids))

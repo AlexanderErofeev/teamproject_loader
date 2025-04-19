@@ -10,12 +10,15 @@ from utils import print_log, requests_get, multiprocessing_map
 def get_results_team(x):
     title, sub_title, id = x['title'], x['instanceNumber'], x['id']
 
+    title = title.replace('. ', '.')
+    sub_title = str(sub_title).zfill(2)
+
     documents = requests_get(f'{DOMAIN}/api/v2/workspaces/{id}/documents/results').json()
 
     report = 'Есть' if documents['reportId'] is not None else 'Нет'
     presentation = 'Есть' if documents['presentationId'] is not None else 'Нет'
 
-    title_str = f'=ГИПЕРССЫЛКА("{DOMAIN}/#/{id}/documents/results"; "{title} ({sub_title})")'
+    title_str = f'=ГИПЕРССЫЛКА("{DOMAIN}/#/{id}/documents/results"; "{title}.{sub_title}")'
     return title_str, report, presentation
 
 
