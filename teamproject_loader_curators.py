@@ -7,12 +7,11 @@ from teamproject_loader_temp_result import get_teams
 from utils import print_log, requests_get, multiprocessing_map, requests_put
 
 UNKNOWN_SCORE = 'Нет оценки'
-TYPICAL_TEAM_ID = '0cd2a112-bcee-4734-80e5-2ae5082d922f'
 
 
-def get_grading_iterations():
+def get_grading_iterations(typical_team_id):
     grading_iterations = []
-    iterations = requests_get(f'{DOMAIN}/api/v2/workspaces/{TYPICAL_TEAM_ID}/iterations').json()
+    iterations = requests_get(f'{DOMAIN}/api/v2/workspaces/{typical_team_id}/iterations').json()
     for iteration in iterations:
         iteration_detale = requests_get(f"{DOMAIN}/api/v2/iterations/{iteration['id']}/scores").json()['iteration']
         if iteration_detale['isGradingOpened']:
@@ -74,7 +73,7 @@ def get_curator_scores():
 
 
 def update_scores(global_start_scores, global_target_scores):
-    iterations = get_grading_iterations()
+    iterations = get_grading_iterations(global_start_scores["team id teamproject"][0])
     print_log(f"Обновление баллов за итерации: {', '.join(list(iterations))}")
     for iteration in iterations:
         print_log(f"Обновление итерации: {iteration}")

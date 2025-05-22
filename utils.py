@@ -69,7 +69,7 @@ def requests_post(url, data):
     for i in range(5):
         try:
             r = requests.post(url, headers=HEADERS, json=data, timeout=5)
-            if r.status_code not in {200, 201}:
+            if r.status_code not in {200, 201, 204}:
                 print_log(f"Ошибка {r.request.body} с URL: {url}", is_error=True)
             else:
                 break
@@ -86,7 +86,7 @@ def requests_put(url, data):
     for i in range(5):
         try:
             r = requests.put(url, headers=HEADERS, json=data, timeout=5)
-            if r.status_code != 200:
+            if r.status_code not in {200, 201, 204}:
                 print_log(f"Ошибка {r.status_code} с URL: {url}", is_error=True)
             else:
                 break
